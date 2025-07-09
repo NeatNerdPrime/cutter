@@ -4,6 +4,7 @@
 #include "dialogs/WriteCommandsDialogs.h"
 #include "dialogs/CommentsDialog.h"
 #include "dialogs/FlagDialog.h"
+#include "shortcuts/ShortcutManager.h"
 
 #include <QPainter>
 #include <QPaintEvent>
@@ -113,30 +114,26 @@ HexWidget::HexWidget(QWidget *parent)
     actionHexPairs->setCheckable(true);
     connect(actionHexPairs, &QAction::triggered, this, &HexWidget::onHexPairsModeEnabled);
 
-    actionCopy = new QAction(tr("Copy"), this);
+    actionCopy = Shortcuts()->makeAction("Hex.copy", this);
     addAction(actionCopy);
     actionCopy->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-    actionCopy->setShortcut(QKeySequence::Copy);
     connect(actionCopy, &QAction::triggered, this, &HexWidget::copy);
 
-    actionCopyAddress = new QAction(tr("Copy address"), this);
+    actionCopyAddress = Shortcuts()->makeAction("General.copyAddress", this);
     actionCopyAddress->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-    actionCopyAddress->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_C);
     connect(actionCopyAddress, &QAction::triggered, this, &HexWidget::copyAddress);
     addAction(actionCopyAddress);
 
     // Add comment option
-    actionComment = new QAction(tr("Add Comment"), this);
+    actionComment = Shortcuts()->makeAction("General.addComment", this);
     actionComment->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-    actionComment->setShortcut(Qt::Key_Semicolon);
     connect(actionComment, &QAction::triggered, this, &HexWidget::onActionAddCommentTriggered);
     addAction(actionComment);
 
     // Add flag option
-    actionAddFlag =
-            new QAction(tr("Add flag at %1").arg(RzAddressString(getLocationAddress())), this);
+    actionAddFlag = Shortcuts()->makeAction("Hex.addFlag", this);
+    actionAddFlag->setText(tr("Add flag at %1").arg(RzAddressString(getLocationAddress())));
     actionAddFlag->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
-    actionAddFlag->setShortcut(Qt::Key_N);
     connect(actionAddFlag, &QAction::triggered, this, &HexWidget::onActionAddFlagTriggered);
     connect(this, &HexWidget::positionChanged, this, [this](RVA pos) {
         RzAnalysisFunction *fcn = Core()->functionAt(pos);
